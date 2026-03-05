@@ -102,7 +102,9 @@ void main() {
   });
 
   group('getProductById', () {
-    test('returns product from remote on success', () async {
+    test('returns product from remote when cache is empty', () async {
+      when(() => mockLocal.getCachedData('product_1'))
+          .thenAnswer((_) async => null);
       when(() => mockRemote.getProductById(1))
           .thenAnswer((_) async => tProductModel);
       when(() => mockLocal.cacheData(any(), any()))
@@ -112,17 +114,48 @@ void main() {
 
       expect(result.id, 1);
       expect(result.title, 'Test');
+      verify(() => mockRemote.getProductById(1)).called(1);
     });
 
-    test('returns cached product when remote fails', () async {
-      when(() => mockRemote.getProductById(1))
-          .thenThrow(Exception('No network'));
+    test('returns cached product immediately and refreshes in background',
+        () async {
       when(() => mockLocal.getCachedData('product_1'))
           .thenAnswer((_) async => tProductModel.toJson());
+      when(() => mockRemote.getProductById(1))
+          .thenAnswer((_) async => tProductModel);
+      when(() => mockLocal.cacheData(any(), any()))
+          .thenAnswer((_) async {});
 
       final result = await repository.getProductById(1);
 
       expect(result.id, 1);
+      // Remote was not awaited, but will fire in background
+    });
+
+    test('returns from remote when cache is empty and caches result',
+        () async {
+      when(() => mockLocal.getCachedData('product_1'))
+          .thenAnswer((_) async => null);
+      when(() => mockRemote.getProductById(1))
+          .thenAnswer((_) async => tProductModel);
+      when(() => mockLocal.cacheData(any(), any()))
+          .thenAnswer((_) async {});
+
+      await repository.getProductById(1);
+
+      verify(() => mockLocal.cacheData('product_1', any())).called(1);
+    });
+
+    test('throws when cache is empty and remote fails', () async {
+      when(() => mockLocal.getCachedData('product_1'))
+          .thenAnswer((_) async => null);
+      when(() => mockRemote.getProductById(1))
+          .thenThrow(Exception('No network'));
+
+      expect(
+        () => repository.getProductById(1),
+        throwsA(isA<Exception>()),
+      );
     });
   });
 }
