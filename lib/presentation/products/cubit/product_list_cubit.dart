@@ -64,7 +64,6 @@ class ProductListCubit extends Cubit<ProductListState> {
   Future<void> refresh() async {
     emit(state.copyWith(
       currentSkip: 0,
-      products: [],
       status: ProductListStatus.loading,
     ));
     await _fetchProducts();

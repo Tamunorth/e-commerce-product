@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -62,7 +63,7 @@ class _DsSearchBarState extends State<DsSearchBar> {
           color: colors.onBackgroundMuted,
         ),
         prefixIcon: Icon(
-          Icons.search,
+          Iconsax.search_normal_1,
           color: colors.onBackgroundMuted,
           size: AppSpacing.xl,
         ),

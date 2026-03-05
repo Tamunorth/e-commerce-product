@@ -14,7 +14,7 @@ class DsChipRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      padding: AppSpacing.paddingHorizontalLg,
+      padding: AppSpacing.paddingHorizontalXl,
       child: Row(
         children: [
           for (int i = 0; i < children.length; i++) ...[

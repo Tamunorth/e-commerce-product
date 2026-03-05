@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../../../core/di/injection.dart';
 import '../../../core/extensions/context_extensions.dart';
@@ -42,6 +44,13 @@ class _ShowcaseScreenState extends State<ShowcaseScreen> {
       backgroundColor: colors.background,
       appBar: AppBar(
         backgroundColor: colors.surface,
+        leading: IconButton(
+          icon: Icon(
+            Iconsax.arrow_left,
+            color: colors.onBackground,
+          ),
+          onPressed: () => context.go('/products'),
+        ),
         title: Text(
           'Design System',
           style: AppTypography.headlineMedium.copyWith(

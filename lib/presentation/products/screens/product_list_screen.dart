@@ -82,13 +82,14 @@ class _ProductListScreenState extends State<ProductListScreen> {
         );
       },
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Search bar + showcase button
           Padding(
             padding: EdgeInsets.fromLTRB(
               AppSpacing.xl,
               AppSpacing.lg,
-              AppSpacing.xl,
+              AppSpacing.xs,
               AppSpacing.sm,
             ),
             child: Row(
@@ -208,8 +209,8 @@ class _ProductGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Loading state: skeleton grid
-    if (status == ProductListStatus.loading) {
+    // Loading state: skeleton grid (only on initial load, not refresh)
+    if (status == ProductListStatus.loading && products.isEmpty) {
       return LayoutBuilder(
         builder: (context, constraints) {
           final cols = _crossAxisCount(constraints.maxWidth);
@@ -243,7 +244,7 @@ class _ProductGrid extends StatelessWidget {
     }
 
     // Products grid with infinite scroll
-    return RefreshIndicator(
+    return RefreshIndicator.adaptive(
       onRefresh: () => context.read<ProductListCubit>().refresh(),
       child: LayoutBuilder(
         builder: (context, constraints) {
