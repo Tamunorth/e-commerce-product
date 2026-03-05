@@ -94,14 +94,31 @@ class ProductRepositoryImpl implements ProductRepository {
   @override
   Future<Product> getProductById(int id) async {
     final cacheKey = 'product_$id';
+
+    // Return cached data immediately if available
+    final cached = await localDatasource.getCachedData(cacheKey);
+    if (cached != null) {
+      // Fire-and-forget background refresh so cache stays fresh
+      _refreshProductInBackground(id, cacheKey);
+      return _productFromMap(Map<String, dynamic>.from(cached));
+    }
+
+    // No cache: fetch from network
     try {
       final model = await remoteDatasource.getProductById(id);
       await localDatasource.cacheData(cacheKey, model.toJson());
       return model.toEntity();
-    } catch (e) {
-      final cached = await localDatasource.getCachedData(cacheKey);
-      if (cached == null) throw e;
-      return _productFromMap(Map<String, dynamic>.from(cached));
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<void> _refreshProductInBackground(int id, String cacheKey) async {
+    try {
+      final model = await remoteDatasource.getProductById(id);
+      await localDatasource.cacheData(cacheKey, model.toJson());
+    } catch (_) {
+      // Silently ignore - we already returned cached data
     }
   }
 
